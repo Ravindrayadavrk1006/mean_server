@@ -8,7 +8,20 @@ var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var dishRouter=require('./routes/dishRouter');
 var promoRouter=require('./routes/promoRouter');
-var leaderRouter=require('./routes/leaderRouter') 
+var leaderRouter=require('./routes/leaderRouter')
+
+//code to connect rest api with the database
+
+const mongoose=require('mongoose');
+const Dishes=require('./models/dishes');
+const url='mongodb://localhost:27017/conFusion';
+const connect=mongoose.connect(url);
+connect.then((db)=>{
+  console.log("connected correctly to the server")
+},(err)=>{console.log("error found",err);});
+
+//upto here connect to database
+
 var app = express();
 
 // view engine setup
