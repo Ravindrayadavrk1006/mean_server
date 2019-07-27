@@ -116,12 +116,8 @@ dishRouter.route('/:dishId')
         res.json(resp);
     },(err)=>next(err))
     .catch((err)=>next(err)) 
-
     // res.end('DELETING   the dishe! =>'+req.params.dishId);
-
 });
-
-
 //handling some remaining part part 3
 
 
