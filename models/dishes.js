@@ -1,7 +1,6 @@
 // const timestamp=require('mongoose-timestamp');
 const mongoose=require('mongoose');
 const Schema=mongoose.Schema;
-
 //using the currency to declare the price of the dish
 require('mongoose-currency').loadType(mongoose)
 const Currency=mongoose.Types.Currency;
@@ -19,8 +18,9 @@ const commentSchema=new Schema({
         type:String,
     },
     author:{
-        type: String,
-        required:true,
+        type: mongoose.Schema.Types.ObjectId,
+
+        ref:'User',
     }
 },
     {

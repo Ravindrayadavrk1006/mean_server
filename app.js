@@ -10,8 +10,7 @@ var fileStore=require('session-file-store')(session);
 //using passport
 var passport=require('passport');
 var authenticate=require('./authenticate');
-
-
+var config=require('./config');
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var dishRouter=require('./routes/dishRouter');
@@ -22,7 +21,8 @@ var leaderRouter=require('./routes/leaderRouter')
 
 const mongoose=require('mongoose');
 const Dishes=require('./models/dishes');
-const url='mongodb://localhost:27017/conFusion';
+// const url='mongodb://localhost:27017/conFusion';
+const url=config.mongoUrl;
 const connect=mongoose.connect(url);
 connect.then((db)=>{
   console.log("connected correctly to the server")
@@ -37,7 +37,7 @@ app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
 
 app.use(logger('dev'));
-app.use(express.json());
+  app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 //working with the authorization
 //place where the autherization code is very important to first doing the auterization and then moving on to further code 
@@ -88,19 +88,19 @@ app.use(cookieParser('12345-67890-09876-54321'));
 //by using the express session
 
 
+//SESSION 
 
-
-app.use(session({
-  name:'session-id',
-  secret:'12345-67890-09876-54321',
-  saveUninitialized:false,
-  resave:false,
-  store:new fileStore()
-}));
+// app.use(session({
+//   name:'session-id',
+//   secret:'12345-67890-09876-54321',
+//   saveUninitialized:false,
+//   resave:false,
+//   store:new fileStore()
+// }));
 
 //using the passport for authentication
 app.use(passport.initialize());
-app.use(passport.session());
+// app.use(passport.session());
 
 
 
@@ -111,22 +111,23 @@ app.use('/users', usersRouter);
 
 //using passport
 
+//this is used to check at all places whether authenticated or not
 
-function auth (req, res, next) {
-      console.log(req.session);
-      //after authentication the passport middleware loads the req with the user object having properties
-    if(!req.user) {
-        var err = new Error('You are not authenticated!');
-        // res.setHeader('WWW-Authenticate','Basic');
-        err.status = 403;
-        return next(err);
-    }
-    else {
-        next();
-    }
-  }
+// function auth (req, res, next) {
+//       console.log(req.session);
+//       //after authentication the passport middleware loads the req with the user object having properties
+//     if(!req.user) {
+//         var err = new Error('You are not authenticated!');
+//         // res.setHeader('WWW-Authenticate','Basic');
+//         err.status = 403;
+//         return next(err);
+//     }
+//     else {
+//     }
+//     next(); 
+//   }
   
-
+//   app.use(auth);
 
 
 
@@ -189,7 +190,7 @@ function auth (req, res, next) {
 //     }
 // }
 
-app.use(auth);
+// app.use(auth);
 
 
 app.use(express.static(path.join(__dirname, 'public')));
@@ -205,7 +206,7 @@ app.use(function(req, res, next) {
 
 // error handler
 app.use(function(err, req, res, next) {
-  // set locals, only providing error in development
+  // set locals, only providing error  in development
   res.locals.message = err.message;
   res.locals.error = req.app.get('env') === 'development' ? err : {};
   // render the error page

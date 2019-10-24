@@ -1,16 +1,14 @@
 var express=require('express');
 const bodyParser=require('body-parser');
 var User=require('../models/user')
-
+var authenticate=require('../authenticate')
 //for passport
 var passport=require('passport');
 
 
 
-
 var router=express.Router();
 router.use(bodyParser.json());
-
 
 /* GET users listing. */
 router.get('/', function(req, res, next) {
@@ -29,15 +27,30 @@ router.post('/signup',function(req,res,next){
     }
     else
     {
-      passport.authenticate('local')(req,res,()=>{
+      if(req.body.firstname)
+      {
+        user.firstname=req.body.firstname;
+      }
+      if(req.body.lastname)
+      {
+        user.lastname=req.body.lastname
+      }
+      user.save((err,user)=>{
+        if(err)
+        {
+          res.statusCode=500;
+          res.setHeader('Content-Type','application/json');
+          res.json({err:err});
+          return;
+        }
+        passport.authenticate('local')(req,res,()=>{
         res.statusCode=200;
         res.setHeader('Content-Type','application/json');
         res.json({success:true,status:'Registration Succesfull! '});
       });
+      });
     }
-
   });
-
 });
 
 //this is using express session and cookies basic authentication
@@ -74,9 +87,13 @@ router.post('/signup',function(req,res,next){
 
 router.post('/login',passport.authenticate('local'),(req,res)=>{
   //this is checking the username and password using the passport.authenticate and the this function is called on basis of being succesfull or error raised
+  
+  //CREATING A TOKEN FOR BEING USED AS JWT AUTHENTICATION 
+  var token=authenticate.getToken({_id:req.user._id})
   res.statusCode=200;
   res.setHeader('Content-Type','application/json');
-  res.json({success:true,status:'You are succesfully logged in'});
+  //token send alongside the succes message
+  res.json({success:true,status:'You are succesfully logged in',token:token,});
 });
 
 

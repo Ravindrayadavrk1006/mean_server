@@ -4,8 +4,7 @@ const leaderRouter=express.Router();
 leaderRouter.use(bodyParser.json());
 const mongoose=require('mongoose');
 const Leader=require('../models/leader');
-
-
+const authenticate=require('../authenticate');
 //defining the working of leader
 leaderRouter.route('/')
 .get((req,res,next)=>{
@@ -17,7 +16,7 @@ leaderRouter.route('/')
     },(err)=>next(err))
     .catch(err=>next(err))
 })
-.post((req,res,next)=>{
+.post(authenticate.verifyUser,(req,res,next)=>{
     // res.end('adding a new leader with'+req.body.name+'with the description'+req.body.description);
     Leader.create(req.body)
     .then((leader)=>{
@@ -28,11 +27,11 @@ leaderRouter.route('/')
     },(err)=>next(err))
     .catch(err=>next(err))
 })
-.put((req,res,next)=>{
+.put(authenticate.verifyUser,(req,res,next)=>{
     res.statusCode=403;//not found
     res.end('cant perform '+req.method+'operation on leader');
 })
-.delete((req,res,next)=>{
+.delete(authenticate.verifyUser,(req,res,next)=>{
     Leader.remove({})
     .then((resp)=>{
         res.statusCode=200;
@@ -56,11 +55,11 @@ leaderRouter.route('/:leaderId')
     // res.write('Hi There!!!');
     // res.end(`sending all the information of leader with id ${req.params.leaderId}`);
 })
-.post((req,res,next)=>{
+.post(authenticate.verifyUser,(req,res,next)=>{
     res.statusCode=403;//can't perform this opration
     res.end('can\'t perform this operation');
 })
-.put((req,res,next)=>{
+.put(authenticate.verifyUser,(req,res,next)=>{
     Leader.findByIdAndUpdate(req.params.leaderId,{$set:req.body},{new:true})
     .then(leader=>{
         console.log(`${req.params.leaderId} has been updated`);
@@ -72,7 +71,7 @@ leaderRouter.route('/:leaderId')
     // res.end(`making changes to ${req.params.leaderId} with the name ${req.body.name} with description ${req.body.description}`);
 
 })
-.delete((req,res,next)=>{
+.delete(authenticate.verifyUser,(req,res,next)=>{
     Leader.findByIdAndDelete(req.params.leaderId)
     .then(resp=>{
         res.statusCode=200;
