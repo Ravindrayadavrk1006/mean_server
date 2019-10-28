@@ -7,15 +7,22 @@ var passport=require('passport');
 
 
 
-var router=express.Router();
-router.use(bodyParser.json());
+var Usersrouter=express.Router();
+Usersrouter.use(bodyParser.json());
 
 /* GET users listing. */
-router.get('/', function(req, res, next) {
-  res.send('respond with a resource');
+Usersrouter.get('/',authenticate.verifyUser,authenticate.verifyAdmin, function(req, res, next) {
+  User.find({})
+  .then((users)=>{
+    res.statusCode=200;
+    res.setHeader('Content-Type','application/json');
+    res.json(users);
+
+},(err)=>next(err))
+.catch((err)=>next(err));;
 });
 
-router.post('/signup',function(req,res,next){
+Usersrouter.post('/signup',function(req,res,next){
 //using passport
   User.register(new User({username: req.body.username}),
     req.body.password,(err,user)=>{
@@ -23,7 +30,7 @@ router.post('/signup',function(req,res,next){
     {
       res.statusCode=500;
       res.setHeader('Content-Type','application/json');
-      res.json({err:err})
+      res.json({err:err})//this will tell the type of error whether a user with that username is already present or not
     }
     else
     {
@@ -85,7 +92,7 @@ router.post('/signup',function(req,res,next){
 // });
 
 
-router.post('/login',passport.authenticate('local'),(req,res)=>{
+Usersrouter.post('/login',passport.authenticate('local'),(req,res)=>{
   //this is checking the username and password using the passport.authenticate and the this function is called on basis of being succesfull or error raised
   
   //CREATING A TOKEN FOR BEING USED AS JWT AUTHENTICATION 
@@ -142,7 +149,7 @@ router.post('/login',passport.authenticate('local'),(req,res)=>{
 
 
 
-router.get('/logout',(req,res,next)=>{
+Usersrouter.get('/logout',(req,res,next)=>{
   if(req.session)
   {
     req.session.destroy();
@@ -170,13 +177,13 @@ router.get('/logout',(req,res,next)=>{
 // var express = require('express');
 // const bodyParser=require('body-parser');
 // var User=require('../models/user')
-// var router = express.Router();
+// var Usersrouter = express.Router();
 // /* GET users listing. */
-// router.get('/', function(req, res, next) {
+// Usersrouter.get('/', function(req, res, next) {
 //   res.send('respond with a resource');
 // });
 
-// router.post('/signup', (req, res, next) => {
+// Usersrouter.post('/signup', (req, res, next) => {
 //   User.findOne({username: req.body.username})
 //   .then((user) => {
 //     if(user != null) {
@@ -198,7 +205,7 @@ router.get('/logout',(req,res,next)=>{
 //   .catch((err) => next(err));
 // });
 
-// router.post('/login', (req, res, next) => {
+// Usersrouter.post('/login', (req, res, next) => {
 
 //   if(!req.session.user) {
 //     var authHeader = req.headers.authorization;
@@ -242,7 +249,7 @@ router.get('/logout',(req,res,next)=>{
 //   }
 // })
 
-// router.get('/logout', (req, res) => {
+// Usersrouter.get('/logout', (req, res) => {
 //   if (req.session) {
 //     req.session.destroy();
 //     res.clearCookie('session-id');
@@ -254,7 +261,7 @@ router.get('/logout',(req,res,next)=>{
 //     next(err);
 //   }
 // });
-// // router.post('/signup',function(req,res,next){
+// // Usersrouter.post('/signup',function(req,res,next){
 // //   User.findOne({username:req.body.username})
 // //   .then((user)=>{
 // //     if(user)
@@ -279,7 +286,7 @@ router.get('/logout',(req,res,next)=>{
 // //   },err=>{next(err)})
 // //   .catch((err)=>{next(err)});
 // // })
-// // router.post('/login',(req,res,next)=>{
+// // Usersrouter.post('/login',(req,res,next)=>{
 // //   if (!req.session.user) {
 // //     var authHeader = req.headers.authorization;
 // //     if (!authHeader) {
@@ -325,7 +332,7 @@ router.get('/logout',(req,res,next)=>{
 // //   }
  
 // //     });   
-// // router.get('/logout',(req,res,next)=>{
+// // Usersrouter.get('/logout',(req,res,next)=>{
 // //   if(req.session)
 // //   {
 // //     req.session.destroy();
@@ -339,4 +346,4 @@ router.get('/logout',(req,res,next)=>{
 // //     next(err);
 // //   }
 // // });
- module.exports = router;
+ module.exports = Usersrouter;

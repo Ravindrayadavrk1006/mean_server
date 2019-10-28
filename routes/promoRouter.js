@@ -17,7 +17,7 @@ promoRouter.route('/')
     },(err)=>next(err))
     .catch(err=>next(err))
 })
-.post(authenticate.verifyUser,(req,res,next)=>
+.post(authenticate.verifyUser,authenticate.verifyAdmin,(req,res,next)=>
 {
     // res.end(`adding the new promotion ${req.body.name} with details ${req.body.description}` );
     Promotions.create(req.body)
@@ -29,11 +29,11 @@ promoRouter.route('/')
     },(err)=>next(err))
     .catch(err=>next(err))
 })
-.put(authenticate.verifyUser,(req,res,next)=>
+.put(authenticate.verifyUser,authenticate.verifyAdmin,(req,res,next)=>
 {
     res.end('cant perform '+req.method+' on promos');
 })
-.delete(authenticate.verifyUser,(req,res,next)=>{
+.delete(authenticate.verifyUser,authenticate.verifyAdmin,(req,res,next)=>{
     // res.end(`deleting the promo page`);
     Promotions.remove({})
     .then((resp)=>{
@@ -57,12 +57,12 @@ promoRouter.route('/:promoId')
     // next();
     .catch(err=>next(err))
 })
-.post(authenticate.verifyUser,(req,res,next)=>
+.post(authenticate.verifyUser,authenticate.verifyAdmin,(req,res,next)=>
 {
     res.statusCode=403;//not found status 
     res.end(`Can't perform the ${req.method} operation on /promo/${req.params.promoId}`);
 })
-.put(authenticate.verifyUser,(req,res,next)=>{
+.put(authenticate.verifyUser,authenticate.verifyAdmin,(req,res,next)=>{
     Promotions.findByIdAndUpdate(req.params.promoId,{$set:req.body},{new:true})
     .then(promo=>{
         res.statusCode=200;
@@ -73,7 +73,7 @@ promoRouter.route('/:promoId')
     // req.write('updating the promo/'+req.params.promoId);
     // res.end(`adding the details to`+req.body.name+'with the details '+req.body.description);
 })
-.delete(authenticate.verifyUser,(req,res,next)=>{
+.delete(authenticate.verifyUser,authenticate.verifyAdmin,(req,res,next)=>{
     Promotions.findOneAndDelete(req.params.promoId)
     .then(resp=>{
         res.statusCode=200;
