@@ -5,13 +5,13 @@ var authenticate=require('../authenticate')
 //for passport
 var passport=require('passport');
 
-
-
+//corse module for resource sharing
+const cors=require('./cors');
 var Usersrouter=express.Router();
 Usersrouter.use(bodyParser.json());
 
 /* GET users listing. */
-Usersrouter.get('/',authenticate.verifyUser,authenticate.verifyAdmin, function(req, res, next) {
+Usersrouter.get('/',cors.corsWithOptions,authenticate.verifyUser,authenticate.verifyAdmin, function(req, res, next) {
   User.find({})
   .then((users)=>{
     res.statusCode=200;
@@ -22,7 +22,7 @@ Usersrouter.get('/',authenticate.verifyUser,authenticate.verifyAdmin, function(r
 .catch((err)=>next(err));;
 });
 
-Usersrouter.post('/signup',function(req,res,next){
+Usersrouter.post('/signup',cors.corsWithOptions,function(req,res,next){
 //using passport
   User.register(new User({username: req.body.username}),
     req.body.password,(err,user)=>{
@@ -92,7 +92,7 @@ Usersrouter.post('/signup',function(req,res,next){
 // });
 
 
-Usersrouter.post('/login',passport.authenticate('local'),(req,res)=>{
+Usersrouter.post('/login',cors.corsWithOptions,passport.authenticate('local'),(req,res)=>{
   //this is checking the username and password using the passport.authenticate and the this function is called on basis of being succesfull or error raised
   
   //CREATING A TOKEN FOR BEING USED AS JWT AUTHENTICATION 
@@ -149,7 +149,7 @@ Usersrouter.post('/login',passport.authenticate('local'),(req,res)=>{
 
 
 
-Usersrouter.get('/logout',(req,res,next)=>{
+Usersrouter.get('/logout',cors.corsWithOptions,(req,res,next)=>{
   if(req.session)
   {
     req.session.destroy();
