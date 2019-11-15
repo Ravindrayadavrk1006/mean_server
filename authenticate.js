@@ -7,9 +7,9 @@ var User=require('./models/user')
 var JwtStrategy=require('passport-jwt').Strategy;
 var ExtractJwt=require('passport-jwt').ExtractJwt;
 var jwt=require('jsonwebtoken');
-
+//for facebook
+facebookTokenStrategy=require('passport-facebook-token');
 var config=require('./config');
-
 
 
 //upto here using passport jwt and jsonwebtoken
@@ -46,7 +46,9 @@ exports.jwtPassport=passport.use(new JwtStrategy(opts,
             
     })
 }));
+//normal authentication 
 exports.verifyUser=passport.authenticate('jwt',{session:false})
+//verifying as admin
 exports.verifyAdmin=function(req,err,next){
     if(req.user.admin==true)
     next();
@@ -71,3 +73,33 @@ exports.verifyAdmin=function(req,err,next){
     //     next(err);
     // }
 // }
+exports.facebookPassport=passport.use(new facebookTokenStrategy({
+    clientID:config.facebook.clientId,
+    clientSecret:config.facebook.clientSecret},(accesToken,refreshToken,profile,done)=>{
+        User.findOne({facebookId:profile.id},(err,user)=>{
+            if(err)
+            {
+                return done(err,false);
+            }
+            if(!err && user!=null)
+            {
+                return done(null,user)
+            }
+            else
+            {
+
+                //creating values for mongodb users 
+                user = new User({ username: profile.displayName });
+                user.facebookId = profile.id;
+                user.firstname = profile.name.givenName;
+                user.lastname = profile.name.familyName;
+                user.save((err, user) => {
+                    if (err)
+                        return done(err, false);
+                    else
+                        return done(null, user);
+                })
+            }
+        })
+    } 
+))

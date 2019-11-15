@@ -7,7 +7,7 @@ var passport=require('passport');
 
 //corse module for resource sharing
 const cors=require('./cors');
-var Usersrouter=express.Router();
+var Usersrouter=express.Router();//creating a express router instance 
 Usersrouter.use(bodyParser.json());
 
 /* GET users listing. */
@@ -346,4 +346,15 @@ Usersrouter.get('/logout',cors.corsWithOptions,(req,res,next)=>{
 // //     next(err);
 // //   }
 // // });
+Usersrouter.get('/facebook/token',passport.authenticate('facebook-token'),(req,res)=>{
+  if(req.user)
+  {
+    //this token now is  a jwt token that can be used for further autherization
+    var token=authenticate.getToken({_id:req.user._id})
+    res.statusCode=200;
+    res.setHeader('Content-Type','application/json');
+    //token send alongside the succes message
+    res.json({success:true,status:'You are succesfully logged in',token:token,});
+  } 
+})
  module.exports = Usersrouter;
